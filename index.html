@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конвертер</title>
+</head>
+<body>
+    <style>
+        body, textarea, input {
+            font-size: 1.2rem;       
+        }
+        
+        .wrap {
+            margin: 0 auto;
+            max-width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+        
+        .result {
+           margin-bottom: 20px;
+        }
+       
+        .butt {
+            margin-right: 25px;
+        }
+     </style> 
+     
+     <div class="wrap">
+        
+        <h2>Перевод из двоичной в десятичную и обратно</h2>
+        
+        <div class="input">
+            <label> <input class="bit_input" type="checkbox" onchange="calc();">Бит 1</label><br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 2</label> <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 3</label> <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 4</label> <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 5</label> <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 6</label> <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 7</label> <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 8</label> <br>
+            <br>
+            <label> <input class="bit_input" type="checkbox"  onchange="calc();">Бит 9</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 10</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 11</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 12</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 13</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 14</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 15</label> <br>
+            <label> <input class="bit_input" type="checkbox"   onchange="calc();">Бит 16</label> <br>      
+            <br>    
+				<input class="result" type="number" min="0" max="65535" oninput="toBool()">  
+            <br>
+            <input class="butt" type="button" value="Очистить" onClick="clearAll()">
+            <input class="butt" type="button" value="Копировать" onClick="copyTObuffer()">
+        </div>    
+        
+    </div>
+
+    <script>
+    // Перевод из двоичной в десятичную  
+    function calc() {
+        let result 
+        let bit_input = document.getElementsByClassName('bit_input');
+            for (let i = 0; i < bit_input.length; i++) {
+                    if (bit_input[i].checked) {
+                        result = "1" + result;
+                    }
+                    else {
+                        result = "0" + result;
+                    }
+                } 
+        document.querySelector(".result").value = parseInt(result, 2);
+    }  
+      
+    // Очистить все деанные
+    function clearAll() {
+        document.querySelector(".result").value = '';
+        toBool();
+    }
+   
+    // Скопировать в буфер обмена десятичное числов в инпуте
+    function copyTObuffer() {
+        let copyText = document.querySelector(".result").value;
+        navigator.clipboard.writeText(copyText);
+        alert("Скопировано: " + copyText);
+    }
+        
+    // Перевод из десятичной в двоичную, запись в теже чекбоксы
+    function toBool() {
+        let value = Number(document.querySelector(".result").value).toString(2);       
+        let bits = document.querySelectorAll('.bit_input');
+        
+        let strB = value.split('');
+
+        for (let i = 0; i < 16; i++) {           
+           
+            if (i < strB.length) {
+                if (strB[strB.length - 1 - i] === '1') {
+                    bits[i].checked = true;
+                }
+                else {
+                    bits[i].checked = false;
+                }
+           }  
+           else {
+            bits[i].checked = false;
+           }         
+        }
+    }
+
+
+
+    </script>
+
+
+</body>
+</html>
