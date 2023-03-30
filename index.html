@@ -50,11 +50,31 @@
       padding: 5px;
     }
 
+    .output-result {
+      width: 70px;
+      display: block;
+    }
+
+    .output-result-oct {
+      width: 110px;
+
+    }
+
+    .output-result__red {
+      background-color: #f3a2a2;
+    }
+
     .output {
       border: 1px solid #e1dede;
       border-radius: 3px;
-      padding: 15px 5px;
       margin: 15px 0;
+      padding: 0 10px;
+    }
+
+    .output-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
     }
 
     .input-description {
@@ -69,30 +89,20 @@
       display: block;
     }
 
-    .output-size {
-      color: rgb(124, 124, 124);
-      font-size: 0.8em;
-      display: inline-block;
-      margin-left: 35px;
-    }
-
     h2 {
       text-align: center;
     }
 
-    .butt {
-      margin-right: 25px;
-      display: inline-block;
+    .range {
+      color: rgb(124, 124, 124);
+      font-size: 0.8em;
     }
-
-    .buttons {
-      margin-bottom: 20px;
-    }
+    
   </style>
 
   <div class="wrap">
 
-    <h2>Перевод из двоичной в десятичную и обратно</h2>
+    <h2>Конвертер </h2>
 
     <div class="input">
       <div class="input-checkbox">
@@ -124,14 +134,29 @@
       </div>
     </div>
     <div class="output">
-      <input class="output-result" type="number" min="0" max="65535" oninput="toBool()">
-      <span class="output-size">
-        0 - 65535
-      </span>
+      <div class="output-row">
+        <input class="output-result" type="text" oninput="toBool()">
+        <div>
+          <span>0x</span>
+          <input class="output-result-oct" type="text" oninput="octToBool()">
+        </div>
+
+      </div>
+      <div class="output-row">
+        <div class="range">
+          0 - 65535
+        </div>
+        <div class="range">
+          0 - 177777
+        </div>
+      </div>
+      <div class="output-row">
+        <div></div>
+        <input class="butt-copy" type="button" value="Копировать" onClick="copyTObuffer()">
+      </div>
     </div>
-    <div class="buttons">
+    <div class="output-row">
       <input class="butt" type="button" value="Очистить" onClick="clearAll()">
-      <input class="butt" type="button" value="Копировать" onClick="copyTObuffer()">
     </div>
 
     <p><a href="https://github.com/stepan-ko/converter-bool-dec">Вернуться к описания репозитория</a></p>
@@ -141,7 +166,7 @@
 
   <script>
 
-    // Перевод из двоичной в десятичную  
+    // Перевод из двоичной  
     function calc() {
       let result
       let bit_input = document.getElementsByClassName('bit_input');
@@ -154,34 +179,32 @@
         }
       }
       document.querySelector(".output-result").value = parseInt(result, 2);
+      document.querySelector(".output-result-oct").value = parseInt(result, 2).toString(8);
     }
 
     // Очистить все деанные
     function clearAll() {
       document.querySelector(".output-result").value = '';
       toBool();
+      document.querySelector(".output-result-oct").value = '';
     }
 
-    // Скопировать в буфер обмена десятичное числов в инпуте
+    // Скопировать в буфер обмена восьмеричное числов с инпута
     function copyTObuffer() {
-      let copyText = document.querySelector(".output-result").value;
-      if (copyText) {
+      let copyText = "0x";
+      copyText += document.querySelector(".output-result-oct").value;
+      if (copyText != "0x") {
         navigator.clipboard.writeText(copyText);
         alert("Скопировано: " + copyText);
       }
     }
 
-    // Перевод из десятичной в двоичную, запись в теже чекбоксы
-    function toBool() {
-      let value = Number(document.querySelector(".output-result").value).toString(2);
+// запись массива из 0 и 1 в значения чекбоксов
+    function boolToBits(arr) {
       let bits = document.querySelectorAll('.bit_input');
-
-      let strB = value.split('');
-
       for (let i = 0; i < 16; i++) {
-
-        if (i < strB.length) {
-          if (strB[strB.length - 1 - i] === '1') {
+        if (i < arr.length) {
+          if (arr[arr.length - 1 - i] === '1') {
             bits[i].checked = true;
           }
           else {
@@ -191,6 +214,53 @@
         else {
           bits[i].checked = false;
         }
+      }
+    }
+
+    // Перевод из десятичной в двоичную, запись в теже чекбоксы
+    function toBool() {      
+      let valueNumber = Number(document.querySelector(".output-result").value); 
+      let strB = Number(document.querySelector(".output-result").value).toString(2).split('');
+
+      if (valueNumber <= 65535) {
+        document.querySelector(".output-result").classList.remove('output-result__red');
+
+        //перевод в восьмиричную
+        document.querySelector(".output-result-oct").value = valueNumber.toString(8);
+
+        //обновить чекбоксы
+        boolToBits(strB);
+      }
+      else {
+        //красить в красный если число неверное
+        document.querySelector(".output-result").classList.add('output-result__red');
+      }
+    }
+
+    // Перевод из восьмиричной в двоичную, запись в теже чекбоксы
+    function octToBool() {
+      let valueNumber = Number(document.querySelector(".output-result-oct").value);   
+      let strB = parseInt(valueNumber, 8).toString(2).split('');
+      let noValid = false;
+
+      valueNumber.toString().split('').forEach((num) => {
+        if (num === '8' || num === '9') {
+          noValid = true;
+        }
+      });
+
+      if (valueNumber <= 177777 && !noValid) {
+        document.querySelector(".output-result-oct").classList.remove('output-result__red');
+
+        //перевод в десятичную
+        document.querySelector(".output-result").value = parseInt(valueNumber, 8).toString(10);
+
+        //обновить чекбоксы
+        boolToBits(strB);
+      }
+      else {
+        //красить в красный если число неверное
+        document.querySelector(".output-result-oct").classList.add('output-result__red');
       }
     }
 
